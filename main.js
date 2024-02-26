@@ -6,8 +6,7 @@ const impuestos = [
     {id: 4, nombre: "IRPF", porcentaje: 10}
 ];
 
-let salarioNominal = parseFloat(document.getElementById("salarioNominal").value);
-
+// Selección de impuesto
 document.addEventListener('DOMContentLoaded', function() {
     const selectImpuesto = document.getElementById('impuestoSelect');
     impuestos.forEach(impuesto => {
@@ -16,10 +15,31 @@ document.addEventListener('DOMContentLoaded', function() {
         option.textContent = impuesto.nombre;
         selectImpuesto.appendChild(option);
     });
-
-    document.getElementById("calcularImpuesto").addEventListener("click", calculoImpuesto);
 });
 
+ // Cargar datos del localStorage
+ cargarDatosDeLS();
+ document.getElementById("calcularImpuesto").addEventListener("click", calculoImpuesto);
+ document.getElementById("calcularTotalImpuestos").addEventListener("click", calcularTotalImpuestos);
+ document.getElementById("calcularSalarioLiquido").addEventListener("click", calcularSalarioLiquido);
+
+function guardarDatosEnLS(salarioNominal) {
+    const datos = {
+        salarioNominal,
+    };
+    localStorage.setItem('datosSalario', JSON.stringify(datos));
+}
+
+function cargarDatosDeLS() {
+    const datosEnJson = localStorage.getItem('datosSalario');
+    if (datosEnJson) {
+        const datos = JSON.parse(datosEnJson);
+        document.getElementById("salarioNominal").value = datos.salarioNominal;
+    }
+}
+
+
+// Funcion para calcular el detalle de cada impuesto según cual se haya seleccionado
 function calculoImpuesto() {
     let salarioNominal = parseFloat(document.getElementById("salarioNominal").value);
     let consultaImpuestos = parseInt(document.getElementById("impuestoSelect").value);
@@ -37,6 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("calcularTotalImpuestos").addEventListener("click", calcularTotalImpuestos);
 });
 
+
+// Funcion para calcular los impuestos totales en base al salario nominal ingresado
 function calcularTotalImpuestos() {
     let salarioNominal = parseFloat(document.getElementById("salarioNominal").value);
     if (isNaN(salarioNominal)) {
@@ -55,6 +77,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("calcularSalarioLiquido").addEventListener("click", calcularSalarioLiquido);
 });
 
+
+// Funcion para calcular el salario liquido en base al salario nominal ingresado
 function calcularSalarioLiquido() {
     const salarioNominalInput = document.getElementById("salarioNominal");
     const resultadoSalarioLiquidoDiv = document.getElementById("resultadoSalarioLiquido");
@@ -69,4 +93,7 @@ function calcularSalarioLiquido() {
     
     let salarioLiquido = salarioNominal - totalImpuestos;
     resultadoSalarioLiquidoDiv.innerText = "Su salario líquido es: $" + salarioLiquido.toFixed(2);
+
+    // Guardar salario nominal en localStorage
+    guardarDatosEnLS(salarioNominal);
 }
